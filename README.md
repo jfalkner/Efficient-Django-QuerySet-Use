@@ -22,10 +22,13 @@ This material comes from work experience at Counsyl and has been presented at th
 
 If you think this talk would be good for your user group or conference, contact jayson@counsyl.com.
 
-### Reuse
+### Reuse and Other Acknowledgement
 
 You are encouraged to take this material and reuse it according to the included [MIT license](LICENSE). In short, you can use it however you like but the work is provided AS IS and you need to include the license to recognize the original authors and Counsyl.
 
+Thanks to Counsyl co-workers Kevin Haas for original authorship of the `pg_bulk_update()` code and Constantin Berzan for guidance regarding bulk update strategies using Postgres.
+
+Thanks to Justine Lam, Imran Haque, and Dave Peticolas for discussion and feedback on the presentation, slides and related code.
 
 ### Examples
 
