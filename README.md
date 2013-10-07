@@ -5,7 +5,7 @@ Code and slides from [Jayson Falkner's](http://bitapocalypse.com/jayson/about/20
 
 This talk is about advanced use of Django's QuerySet API based on lessons learned at [Counsyl](https://www.counsyl.com/jobs/). You'll learn how to debug, optimize and use the QuerySet API efficiently. The main examples focus on demystifying how QuerySet maps to SQL and how seemingly simple Python code, presumably fast O(1) queries, can result in unacceptably long runtime and often O(N) or worse queries. Solutions are provided for keeping your Python code simple and RDMS use performant.
 
-Here is one of the key slides to pique your interest.
+Here is one of the key slides to pique your interest. It is the same query tuned via different strategies to get optimal performance.
 
 ![If you only see one slide](if-you-only-see-one-slide.jpg)
 
