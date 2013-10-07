@@ -35,6 +35,10 @@ Below are the scripts to run the examples from the slides. All scripts assume:
 
 This set includes doing the often intuitive yet worst possible QuerySet use. The optimization method of using  `prefetch_related()` demonstrates a 10x speed increase. Examples are done with 1,000 rows in the `Sample` table.
 
+
+These examples require use of the `demo` Django app included in this repository. From the base directory that this README.md file is in do the following.
+
+
 ```
 # Setup the demo's data models.
 cd demo
@@ -43,8 +47,11 @@ python manage.py syncdb
 
 # Run the demo.
 python manage.py shell
+```
 
+The rest of the commands can be copy-and-pasted in to Django's shell. For the `track_sql()` and `print_sql()` timing metrics to be helpful you must paste each complete `%cpaste` through `--` section all at once.
 
+```
 # Make up 1,000 samples to get sub-second queries for looping.
 from example.utils import make_fake_data
 make_fake_data()
@@ -88,6 +95,8 @@ counsyl.db.print_sql(show_queries=False)
 
 This example set relies on an SQL JOIN to 20-50x more efficiently perform the original query. Examples are using 10,000 rows in the `Sample` table.
 
+You do not need to reset the Django `demo` app for these examples. The same code base is used for the JOIN examples.
+
 ```
 # Make up 10,000 samples to get second(ish) queries for JOIN use.
 from example.utils import make_fake_data
@@ -125,6 +134,7 @@ counsyl.db.print_sql()
 
 This set includes the optimal known use of QuerySet using Postgres including denormalizing the fields used for the query and a multicolumn index. This is roughly 100,000x improvement over the original query and 1,000x over the SQL JOIN based strategies. 
 
+You will have to `reset demo`, swith to the `demo-optimized` Django app and `syncdb` in order to run these examples. The denormalized data model is slightly different than that of the original examples. 
 
 ```
 # Reset the data models and load a denormalized view.
