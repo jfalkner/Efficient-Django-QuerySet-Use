@@ -5,7 +5,11 @@ Code and slides from [Jayson Falkner's](http://bitapocalypse.com/jayson/about/20
 
 This talk is about advanced use of Django's QuerySet API based on lessons learned at [Counsyl](https://www.counsyl.com/jobs/). You'll learn how to debug, optimize and use the QuerySet API efficiently. The main examples focus on demystifying how QuerySet maps to SQL and how seemingly simple Python code, presumably fast O(1) queries, can result in unacceptably long runtime and often O(N) or worse queries. Solutions are provided for keeping your Python code simple and RDMS use performant.
 
-### Speaker Bio:
+Here is one of the key slides to pique your interest.
+
+![If you only see one slide](if-you-only-see-one-slide.jpg)
+
+### Speaker Bio
 
 Jayson Falker is a software developer for Counsyl. He has an EEN/CS degree and a PhD in Bioinformatics. He is a long-time open-source Linux/Java/Web developer, book author, and presenter. He has focused on proteomics and genomics research since the mid-2000's, including working for a few years at startups and for Dow AgroSciences. Jayson is quick to get his geek on and also loves to build ridiculous side-projects, including a 6' tall Jenga set that weighs 300lbs and mobile apps that give you awesome virtual mustaches.
 
@@ -103,7 +107,19 @@ from example.utils import make_fake_data
 make_fake_data(samples_to_make=1000000)
 
 
-# Run the select_related(), looping query.
+# Run the JOIN without select_related()
+%cpaste
+counsyl.db.track_sql()
+vals = list(Sample.objects
+            .annotate(latest_status_code=Max('statuses__status_code'))
+            .filter(production=True,
+                    latest_status_code__eq=SampleStatus.LAB)
+            .values_list('barcode', 'statuses__created'))
+counsyl.db.print_sql()
+--
+
+
+# Run the select_related(), looping query. Denormalize fail.
 %cpaste
 counsyl.db.track_sql()
 results = []
@@ -117,16 +133,6 @@ counsyl.db.print_sql()
 --
 
 
-# Run the JOIN without select_related()
-%cpaste
-counsyl.db.track_sql()
-vals = list(Sample.objects
-            .annotate(latest_status_code=Max('statuses__status_code'))
-            .filter(production=True,
-                    latest_status_code__eq=SampleStatus.LAB)
-            .values_list('barcode', 'statuses__created'))
-counsyl.db.print_sql()
---
 
 ```
 
