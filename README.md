@@ -3,9 +3,7 @@ Efficient Django QuerySet Use
 
 Code and slides from [Jayson Falkner's](http://bitapocalypse.com/jayson/about/2013/07/17/jayson-falkner/) "Efficient Django QuerySet Use".
 
-### Counsyl.objects.filter(django_queryset_type=EXAMPLES, helpful=True)<br/>(Helpful examples of Django QuerySet use at Counsyl)
-
-This talk is about advanced use of Django's QuerySet API based on lessons learned at Counsyl. You'll learn how to debug, optimize and use the QuerySet API efficiently. The main examples focus on demystifying how QuerySet maps to SQL and how seemingly simple Python code, presumably fast O(1) queries, can result in unacceptably long runtime and often O(N) or worse queries. Solutions are provided for keeping your Python code simple and RDMS use performant.
+This talk is about advanced use of Django's QuerySet API based on lessons learned at [Counsyl](https://www.counsyl.com/jobs/). You'll learn how to debug, optimize and use the QuerySet API efficiently. The main examples focus on demystifying how QuerySet maps to SQL and how seemingly simple Python code, presumably fast O(1) queries, can result in unacceptably long runtime and often O(N) or worse queries. Solutions are provided for keeping your Python code simple and RDMS use performant.
 
 ### Speaker Bio:
 
@@ -33,9 +31,9 @@ Below are the scripts to run the examples from the slides. All scripts assume:
 - You have Django 1.5 installed
 - You are in the base directory. The one with this file.
 
-#### Example Set #1: Query With Loop, prefetch_related(), select_related()
+#### Example Set #1: QuerySet With Loop (no optimization and prefetch_related())
 
-This set includes doing the often intuitive yet worst possible QuerySet use. Optimization methods of using `select_related()` and `prefetch_related()` demonstrated a 10x speed increase.
+This set includes doing the often intuitive yet worst possible QuerySet use. The optimization method of using  `prefetch_related()` demonstrates a 10x speed increase. Examples are done with 1,000 rows in the `Sample` table.
 
 ```
 # Setup the demo's data models.
@@ -47,7 +45,7 @@ python manage.py syncdb
 python manage.py shell
 
 
-# Make the fake data.
+# Make up 1,000 samples to get sub-second queries for looping.
 from example.utils import make_fake_data
 make_fake_data()
 
@@ -84,6 +82,16 @@ for sample in samples:
 counsyl.db.print_sql()
 counsyl.db.print_sql(show_queries=False)
 --
+```
+
+#### Example Set #2: QuerySet using SQL JOIN (select_related() or annotate())
+
+This example set relies on an SQL JOIN to 20-50x more efficiently perform the original query. Examples are using 10,000 rows in the `Sample` table.
+
+```
+# Make up 10,000 samples to get second(ish) queries for JOIN use.
+from example.utils import make_fake_data
+make_fake_data(samples_to_make=1000000)
 
 
 # Run the select_related(), looping query.
@@ -98,11 +106,24 @@ for sample in samples:
     results.append((sample.barcode, sample.latest_status.created))
 counsyl.db.print_sql()
 --
+
+
+# Run the JOIN without select_related()
+%cpaste
+counsyl.db.track_sql()
+vals = list(Sample.objects
+            .annotate(latest_status_code=Max('statuses__status_code'))
+            .filter(production=True,
+                    latest_status_code__eq=SampleStatus.LAB)
+            .values_list('barcode', 'statuses__created'))
+counsyl.db.print_sql()
+--
+
 ```
 
-#### Example #2: Denormalization and Multi-column INDEX
+#### Example #3: Denormalization and Multi-column INDEX
 
-This set includes the optimal known solution for using Postgres including denormalizing the fields used for the query and a multicolumn index.
+This set includes the optimal known use of QuerySet using Postgres including denormalizing the fields used for the query and a multicolumn index. This is roughly 100,000x improvement over the original query and 1,000x over the SQL JOIN based strategies. 
 
 
 ```
