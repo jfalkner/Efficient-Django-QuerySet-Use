@@ -37,6 +37,7 @@ Below are the scripts to run the examples from the slides. All scripts assume:
 - You are running Python 2.7.2 (newer versions may work fine too)
 - You have Django 1.5 installed
 - You are in the base directory. The one with this file.
+- You have `pip install sqlparse`
 
 #### Example Set #1: QuerySet With Loop (no optimization and prefetch_related())
 
