@@ -50,6 +50,7 @@ These examples require use of the `demo` Django app included in this repository.
 ```
 # Setup the demo's data models.
 cd demo
+psql -c "CREATE DATABASE demo;"
 python manage.py reset example
 python manage.py syncdb
 
