@@ -30,7 +30,7 @@ def pg_multicolumn_index(model, column_names, cursor=None):
     # Create the index.
     cursor.execute(
         "CREATE INDEX \"" + db_index + "\"" +
-        " ON \"" + db_table + "\" (%s);"%(','.join(db_column_names)))
+        " ON \"" + db_table + "\" (%s);", [','.join(db_column_names)])
     cursor.execute("COMMIT;")
 
 
