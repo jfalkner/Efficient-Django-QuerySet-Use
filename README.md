@@ -37,6 +37,7 @@ Below are the scripts to run the examples from the slides. All scripts assume:
 - You are running Python 2.7.2 (newer versions may work fine too)
 - You have Django 1.5 installed
 - You are in the base directory. The one with this file.
+- You have `pip install sqlparse`
 
 #### Example Set #1: QuerySet With Loop (no optimization and prefetch_related())
 
@@ -49,7 +50,7 @@ These examples require use of the `demo` Django app included in this repository.
 ```
 # Setup the demo's data models.
 cd demo
-python manage.py reset example
+psql -c "CREATE DATABASE demo;"
 python manage.py syncdb
 
 # Run the demo.
@@ -63,7 +64,7 @@ The rest of the commands can be copy-and-pasted in to Django's shell. For the `t
 from example.utils import make_fake_data
 make_fake_data()
 
-# Run the query.
+# Import Models.
 from example.models import Sample, SampleStatus
 import counsyl.db
 from django.db.models import Max
@@ -107,7 +108,7 @@ You do not need to reset the Django `demo` app for these examples. The same code
 ```
 # Make up 10,000 samples to get second(ish) queries for JOIN use.
 from example.utils import make_fake_data
-make_fake_data(samples_to_make=1000000)
+make_fake_data(samples_to_make=10000)
 
 
 # Run the JOIN without select_related()
@@ -116,7 +117,7 @@ counsyl.db.track_sql()
 vals = list(Sample.objects
             .annotate(latest_status_code=Max('statuses__status_code'))
             .filter(production=True,
-                    latest_status_code__eq=SampleStatus.LAB)
+                    latest_status_code=SampleStatus.LAB)
             .values_list('barcode', 'statuses__created'))
 counsyl.db.print_sql()
 --
@@ -148,7 +149,8 @@ You will have to `reset demo`, swith to the `demo-optimized` Django app and `syn
 ```
 # Reset the data models and load a denormalized view.
 cd demo-optimized
-python manage.py reset example
+psql -c "DROP DATABASE demo;"
+psql -c "CREATE DATABASE demo;"
 python manage.py syncdb
 
 
@@ -157,8 +159,11 @@ python manage.py shell
 
 # Make up 1,000,000 fake samples. Won't take long.
 from example.utils import make_fake_data
-make_fake_data(samples_to_make=1000000)
+make_fake_data(samples_to_make=1000000, batch_threshold=100000, make_statuses=False)
 
+# Import models.
+from example.models import Sample, SampleStatus
+import counsyl.db
 
 # Query without a multicolumn index.
 %cpaste
@@ -166,7 +171,7 @@ counsyl.db.track_sql()
 vals = list(Sample.objects
                   .filter(production=True,
                           status_code = SampleStatus.LAB)
-                  .values_list('barcode', 'status_changed'))
+                  .values_list('barcode', 'status_created'))
 counsyl.db.print_sql()
 --
 
@@ -182,7 +187,7 @@ counsyl.db.track_sql()
 vals = list(Sample.objects
                   .filter(production=True,
                           status_code = SampleStatus.LAB)
-                  .values_list('barcode', 'status_changed'))
+                  .values_list('barcode', 'status_created'))
 counsyl.db.print_sql()
 --
 
@@ -198,7 +203,7 @@ counsyl.db.track_sql()
 vals = list(Sample.objects
                   .filter(production=True,
                           status_code = SampleStatus.LAB)
-                  .values_list('barcode', 'status_changed'))
+                  .values_list('barcode', 'status_created'))
 counsyl.db.print_sql()
 --
 ```
