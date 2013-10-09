@@ -27,7 +27,7 @@ def pg_multicolumn_index(model, column_names, cursor=None):
     db_table = model._meta.db_table
     allowed_names = [field.name for field in model._meta.fields]
     for column_name in column_names:
-        assert column_name in allowed_names
+        assert column_name in allowed_names, "Column Name needs to be in model"
     db_column_names = [model._meta.get_field(column_name).column for column_name in column_names]
     db_index = "%s-%s" % (db_table, '_'.join(db_column_names))
     # Create the index.
