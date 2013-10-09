@@ -187,7 +187,7 @@ counsyl.db.track_sql()
 vals = list(Sample.objects
                   .filter(production=True,
                           status_code = SampleStatus.LAB)
-                  .values_list('barcode', 'status_changed'))
+                  .values_list('barcode', 'status_created'))
 counsyl.db.print_sql()
 --
 
@@ -203,7 +203,7 @@ counsyl.db.track_sql()
 vals = list(Sample.objects
                   .filter(production=True,
                           status_code = SampleStatus.LAB)
-                  .values_list('barcode', 'status_changed'))
+                  .values_list('barcode', 'status_created'))
 counsyl.db.print_sql()
 --
 ```

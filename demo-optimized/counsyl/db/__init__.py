@@ -25,12 +25,15 @@ def pg_multicolumn_index(model, column_names, cursor=None):
     cursor = cursor or con.cursor()
     # Get table name and column name as stored in database.
     db_table = model._meta.db_table
+    allowed_names = [field.name for field in model._meta.fields]
+    for column_name in column_names:
+        assert column_name in allowed_names
     db_column_names = [model._meta.get_field(column_name).column for column_name in column_names]
-    db_index = "%s-%s"%(db_table, '_'.join(db_column_names))
+    db_index = "%s-%s" % (db_table, '_'.join(db_column_names))
     # Create the index.
     cursor.execute(
         "CREATE INDEX \"" + db_index + "\"" +
-        " ON \"" + db_table + "\" (%s);", [','.join(db_column_names)])
+        " ON \"" + db_table + "\" (%s);" % (','.join(db_column_names)))
     cursor.execute("COMMIT;")
 
 
