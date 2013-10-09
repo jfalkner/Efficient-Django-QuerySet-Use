@@ -1,4 +1,3 @@
-from datetime import datetime
 from django.utils.timezone import utc
 
 from counsyl.db import pg_bulk_update
@@ -19,16 +18,17 @@ def make_fake_data(samples_to_make=100000, batch_threshold=100000, delete_existi
         print "Deleted existing"
 
     # Make up a set of
-    offset = samples_to_make-samples_to_make/52/years
+    offset = samples_to_make - samples_to_make/52/years
 
     # Create all the samples.
     samples = []
-    for barcode in range(samples_to_make):
+    barcodes = range(samples_to_make)
+    for barcode in barcodes:
         sample = Sample()
         sample.barcode = str(barcode)
         sample.created = now()
         sample.status_created = sample.created
-        if len(samples) < offset:
+        if barcode < offset:
             sample.status_code = SampleStatus.COMPLETE
         else:
             sample.status_code = SampleStatus.LAB
@@ -37,10 +37,10 @@ def make_fake_data(samples_to_make=100000, batch_threshold=100000, delete_existi
         if len(samples) >= batch_threshold:
             Sample.objects.bulk_create(samples)
             del samples[:]
-            print "Made %s samples."%Sample.objects.count()
+            print "Made %s samples." % Sample.objects.count()
     if samples:
         Sample.objects.bulk_create(samples)
-    print "Finished making %s samples."%Sample.objects.count()
+    print "Finished making %s samples." % Sample.objects.count()
 
     if not make_statuses:
         return
