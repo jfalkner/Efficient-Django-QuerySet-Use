@@ -1,7 +1,4 @@
-from datetime import datetime
 from django.utils.timezone import utc
-from django.db.models import Max
-from django.db.models import F
 
 from counsyl.db import pg_bulk_update
 
