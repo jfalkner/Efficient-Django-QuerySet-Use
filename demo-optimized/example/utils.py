@@ -1,6 +1,6 @@
 from django.utils.timezone import utc
 
-from counsyl.db import pg_bulk_update
+from django_db_utils import pg_bulk_update
 
 from example.models import Sample, SampleStatus
 
