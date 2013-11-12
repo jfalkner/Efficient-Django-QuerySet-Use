@@ -18,6 +18,7 @@ Jayson Falker is a software developer for Counsyl. He has an EEN/CS degree and a
 This material comes from work experience at Counsyl and has been presented at the following events:
 
 - Oct 10th, 2013 - [The San Francisco Django Meetup Group](http://www.meetup.com/The-San-Francisco-Django-Meetup-Group/events/141505312/) @ [Counsyl](http://maps.google.com/maps?q=180+Kimball+Way%2C+South+San+Francisco%2C+CA)
+- Oct 23rd, 2013 - [Petri Dish (Counsyl Blog)](http://blog.counsyl.com/2013/10/23/efficient-django-queryset-use/). Includes [slideshare + audio](http://www.slideshare.net/Counsyl/efficient-djangoquery-setuse).
 - Nov 12th 2013 - [Portland Python Users Group](http://www.meetup.com/pdxpython/events/139924722/) @ [Urban Airship](http://maps.google.com/maps?q=1417+NW+Everett+St%2C+Portland%2C+OR)
 
 If you think this talk would be good for your user group or conference, contact jayson@counsyl.com.
