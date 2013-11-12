@@ -208,4 +208,50 @@ counsyl.db.print_sql()
 --
 ```
 
+#### Django 1.4 and below multi-column INDEX
 
+Django's `index_together` option was added in 1.5. If you are running an older version of 
+Django you can still manually add an SQL index and obtain the same performance boost. Use
+the `pg_multicolumn_index` method.
+
+For example, to replicate the index on this presentation's `Sample` class.
+
+```
+# Launch a shell.
+./manage.py shell
+
+# Add the multi-column index using the helper method.
+from django_pg_utils import pg_multicolumn_index
+pg_multicolumn_index(Sample, ['production', 'status_code'])
+```
+
+You can confirm that the index exists by using `psql` (if using Postgres) or equivalent to
+browse the schema for the `example_sample` table.
+
+```
+# Launch psql to directly interact with Postgres.
+psql -h 127.0.0.1 demo
+
+# Display the table and constraints.
+demo=# \d example_sample                                                                                                                                                                                                                                                     Table "public.example_sample"
+     Column     |           Type           |                          Modifiers                          
+----------------+--------------------------+-------------------------------------------------------------
+ id             | integer                  | not null default nextval('example_sample_id_seq'::regclass)
+ barcode        | character varying(10)    | not null
+ production     | boolean                  | not null
+ created        | timestamp with time zone | not null
+ status_code    | smallint                 | not null
+ status_created | timestamp with time zone | not null
+Indexes:
+    "example_sample_pkey" PRIMARY KEY, btree (id)
+    "example_sample_barcode_key" UNIQUE CONSTRAINT, btree (barcode)
+    "example_sample_6d7e6b4a" btree (production, status_code)
+    "example_sample_barcode_like" btree (barcode varchar_pattern_ops)
+Check constraints:
+    "example_sample_status_code_check" CHECK (status_code >= 0)
+Referenced by:
+    TABLE "example_samplestatus" CONSTRAINT "example_samplestatus_sample_id_fkey" FOREIGN KEY (sample_id) REFERENCES example_sample(id) DEFERRABLE INITIALLY DEFERRED
+```
+
+The specific index you are looking for is `"example_sample_6d7e6b4a" btree (production, status_code)`. The
+particular name doesn't matter as long as `(production, status_code)` are grouped.

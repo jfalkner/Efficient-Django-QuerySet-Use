@@ -8,6 +8,9 @@ class Sample(models.Model):
     status_code = models.PositiveSmallIntegerField()
     status_created = models.DateTimeField()
 
+    class Meta:
+        index_together = [["production", "status_code"],]
+
 
 class SampleStatus(models.Model):
     sample = models.ForeignKey(Sample, related_name='statuses')
